@@ -1,10 +1,11 @@
 package com.coursitory.app.Repositories;
 
-import com.coursitory.app.Entities.PDF;
+import com.coursitory.app.Entities.User;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PDFRepository extends MongoRepository<PDF, ObjectId> {
+public interface UserRepository extends MongoRepository<User, ObjectId> {
+    User findByUsername(String username);
 }

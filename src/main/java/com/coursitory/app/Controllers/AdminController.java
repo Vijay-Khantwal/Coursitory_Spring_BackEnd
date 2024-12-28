@@ -1,11 +1,11 @@
 package com.coursitory.app.Controllers;
 
 import com.coursitory.app.Entities.Course;
-import com.coursitory.app.Repositories.CourseRepository;
+import com.coursitory.app.Entities.User;
+import com.coursitory.app.Services.AdminService;
 import com.coursitory.app.Services.CourseService;
 import com.coursitory.app.Services.PDFService;
 import com.coursitory.app.Services.VideoService;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,21 +13,54 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
-public class CourseController {
-    @Autowired
-    CourseService courseService;
-    @Autowired
-    CourseRepository courseRepository;
-
-    @Autowired
-    VideoService videoService;
+@RequestMapping("/admin")
+public class AdminController {
 
     @Autowired
     PDFService pdfService;
 
+    @Autowired
+    AdminService adminService;
+
+    @Autowired
+    CourseService courseService;
+
+    @Autowired
+    VideoService videoService;
+
+    @PostMapping("/login")
+    public String adminLogin(@RequestBody User user) {
+        return adminService.verifyAdmin(user);
+    }
+
+    //###################################### PDF ######################################################
+
+    @PostMapping("/upload/pdf")
+    public ResponseEntity<String> uploadPDF(@RequestParam("file") MultipartFile file){
+        try {
+            String pdfId = pdfService.uploadPDF(file);
+            return ResponseEntity.status(HttpStatus.CREATED).body("fieldId :- "+pdfId);
+        }
+        catch (IOException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in uploading! " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("delete/pdf/{id}")
+    public  ResponseEntity<String> deletePDF(@PathVariable("id") String pdfId){
+        if(pdfService.deletePDF(pdfId)){
+            return ResponseEntity.ok().body("PDF successfully deleted");
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("PdfId invalid! ");
+        }
+    }
+
+    //###################################### ************** ######################################################
+
+    //###################################### CourseContent ######################################################
 
     @PostMapping("/create/Course")
     public ResponseEntity<Course> createCourse(@RequestBody Course course) {
@@ -44,20 +77,6 @@ public class CourseController {
         }
     }
 
-    @GetMapping("/get/Courses")
-    public ResponseEntity<List<Course>> getAllCourses() {
-        try {
-            List<Course> courses = courseService.getAll();
-            if (courses.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-            } else {
-                return ResponseEntity.ok().body(courses);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
     @PostMapping("/upload_video/{courseId}")
     public ResponseEntity<String> uploadVideo(@PathVariable String courseId, @RequestParam("file") MultipartFile file,
                                               @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
@@ -71,7 +90,7 @@ public class CourseController {
         String videoId = videoService.uploadVideo(file, thumbnail, title, description);
 
         course.getVideoList().add(videoId);
-        courseRepository.save(course);
+        courseService.saveUpdatedCourse(course);
 
         return new ResponseEntity<>(videoId, HttpStatus.OK);
     }
@@ -86,8 +105,13 @@ public class CourseController {
         String pdfId = pdfService.uploadPDF(file);
 
         course.getPdfList().add(pdfId);
-        courseRepository.save(course);
+        courseService.saveUpdatedCourse(course);
+
         return new ResponseEntity<>(pdfId, HttpStatus.OK);
     }
 
+    //###################################### ************* ######################################################
+
+
 }
+

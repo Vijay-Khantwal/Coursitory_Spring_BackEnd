@@ -30,6 +30,9 @@ public class CourseService {
         // Save the course in the database
         courseRepository.save(course);
     }
+    public void saveUpdatedCourse(Course course){
+        courseRepository.save(course);
+    }
 
     public List<Course> getAll(){
         return courseRepository.findAll();
