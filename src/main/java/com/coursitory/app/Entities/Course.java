@@ -22,6 +22,14 @@ public class Course {
     private double rating = 0;
     private List<String> videoList;
     private List<String> pdfList ;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private ObjectId thumbnail;
+
+    public Course(@NonNull String title, String description, List<String> tags) {
+        this.title = title;
+        this.description = description;
+        this.tags = tags;
+    }
 
     public ObjectId getId() {
         return id;
@@ -31,11 +39,11 @@ public class Course {
         this.id = id;
     }
 
-    public String getTitle() {
+    public @NonNull String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@NonNull String title) {
         this.title = title;
     }
 
@@ -59,7 +67,7 @@ public class Course {
         return rating;
     }
 
-    public void setRating(long rating) {
+    public void setRating(double rating) {
         this.rating = rating;
     }
 
@@ -77,5 +85,13 @@ public class Course {
 
     public void setPdfList(List<String> pdfList) {
         this.pdfList = pdfList;
+    }
+
+    public ObjectId getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(ObjectId thumbnail) {
+        this.thumbnail = thumbnail;
     }
 }

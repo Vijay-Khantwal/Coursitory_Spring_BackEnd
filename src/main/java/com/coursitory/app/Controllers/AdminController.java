@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin")
@@ -30,46 +32,20 @@ public class AdminController {
     @Autowired
     VideoService videoService;
 
-    @PostMapping("/login")
-    public String adminLogin(@RequestBody User user) {
-        return adminService.verifyAdmin(user);
-    }
-
-    //###################################### PDF ######################################################
-
-    @PostMapping("/upload/pdf")
-    public ResponseEntity<String> uploadPDF(@RequestParam("file") MultipartFile file){
-        try {
-            String pdfId = pdfService.uploadPDF(file);
-            return ResponseEntity.status(HttpStatus.CREATED).body("fieldId :- "+pdfId);
-        }
-        catch (IOException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in uploading! " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("delete/pdf/{id}")
-    public  ResponseEntity<String> deletePDF(@PathVariable("id") String pdfId){
-        if(pdfService.deletePDF(pdfId)){
-            return ResponseEntity.ok().body("PDF successfully deleted");
-        }
-        else{
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("PdfId invalid! ");
-        }
-    }
-
-    //###################################### ************** ######################################################
-
     //###################################### CourseContent ######################################################
 
     @PostMapping("/create/Course")
-    public ResponseEntity<Course> createCourse(@RequestBody Course course) {
+    public ResponseEntity<Course> createCourse(@RequestParam String title,
+                                               @RequestParam String description, @RequestParam List<String> tags,
+                                               @RequestParam(value = "file", required = false) MultipartFile thumbnail) {
         try {
             // Ensure that title is provided (mandatory field)
-            if (course.getTitle() == null || course.getTitle().isEmpty()) {
+            if (title == null || title.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-            courseService.createCourse(course);
+//            System.out.println(tags);
+            Course course = new Course(title, description, tags);
+            courseService.createCourse(course, thumbnail);
             return new ResponseEntity<>(course, HttpStatus.CREATED);
 
         } catch (Exception e) {
@@ -96,13 +72,13 @@ public class AdminController {
     }
 
     @PostMapping("/upload_pdf/{courseId}")
-    public ResponseEntity<String> uploadPdf(@PathVariable String courseId, @RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<String> uploadPdf(@PathVariable String courseId, @RequestParam("file") MultipartFile file,@RequestParam("title") String title) throws IOException {
 
         Course course = courseService.getCourseById(courseId);
         if (course == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        String pdfId = pdfService.uploadPDF(file);
+        String pdfId = pdfService.uploadPDF(file,title);
 
         course.getPdfList().add(pdfId);
         courseService.saveUpdatedCourse(course);
@@ -111,6 +87,31 @@ public class AdminController {
     }
 
     //###################################### ************* ######################################################
+
+
+    //###################################### PDF ######################################################
+
+    @PostMapping("/upload/pdf")
+    public ResponseEntity<String> uploadPDF(@RequestParam("file") MultipartFile file,@RequestParam("title") String title) {
+        try {
+            String pdfId = pdfService.uploadPDF(file,title);
+            return ResponseEntity.status(HttpStatus.CREATED).body("fieldId :- " + pdfId);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in uploading! " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("delete/pdf/{id}")
+    public ResponseEntity<String> deletePDF(@PathVariable("id") String pdfId) {
+        if (pdfService.deletePDF(pdfId)) {
+            return ResponseEntity.ok().body("PDF successfully deleted");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("PdfId invalid! ");
+        }
+    }
+
+    //###################################### ************** ######################################################
+
 
 
 }

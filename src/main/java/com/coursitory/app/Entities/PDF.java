@@ -13,6 +13,8 @@ public class PDF {
 
     @Id
     private ObjectId id;
+    private String title;
+    private byte[] content;  // Store the PDF content as binary data
 
     public ObjectId getId() {
         return id;
@@ -23,11 +25,11 @@ public class PDF {
     }
 
     public String getFilename() {
-        return filename;
+        return title;
     }
 
     public void setFilename(String filename) {
-        this.filename = filename;
+        this.title = filename;
     }
 
     public byte[] getContent() {
@@ -38,6 +40,4 @@ public class PDF {
         this.content = content;
     }
 
-    private String filename;
-    private byte[] content;  // Store the PDF content as binary data
 }

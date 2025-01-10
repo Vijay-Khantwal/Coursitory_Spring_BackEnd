@@ -49,35 +49,58 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            username = jwtService.extractUserName(token);
+            try {
+                username = jwtService.extractUserName(token);
+            } catch (io.jsonwebtoken.ExpiredJwtException ex) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
+                response.getWriter().write("Unauthorized: Token has expired");
+                return;
+            } catch (Exception ex) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // 400 Bad Request
+                response.getWriter().write("Bad Request: Invalid token");
+                return;
+            }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
             Boolean isAdmin = jwtService.extractIsAdmin(token);
 
-            //for admin
-            if (isAdmin != null && isAdmin) {
-                if (username.equals(adminName)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            username, null, List.of(new SimpleGrantedAuthority("ADMIN")));
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+            try {
+                // Handle admin authentication
+                if (isAdmin != null && isAdmin) {
+                    if (username.equals(adminName)) {
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                username, null, List.of(new SimpleGrantedAuthority("ADMIN")));
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403 Forbidden
+                        response.getWriter().write("Forbidden: Invalid Admin credentials");
+                        return;
+                    }
                 } else {
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.getWriter().write("Forbidden: Invalid Admin credentials");
-                    return;
-                }
-            } else {
-                // Proceed with regular user authentication
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    // Handle regular user authentication
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (jwtService.validateToken(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, List.of(new SimpleGrantedAuthority("USER")));
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    if (jwtService.validateToken(token, userDetails)) {
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, List.of(new SimpleGrantedAuthority("USER")));
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
+                        response.getWriter().write("Unauthorized: Token validation failed");
+                        return;
+                    }
                 }
+            } catch (io.jsonwebtoken.ExpiredJwtException ex) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
+                response.getWriter().write("Unauthorized: Token has expired");
+                return;
+            } catch (Exception ex) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // 400 Bad Request
+                response.getWriter().write("Bad Request: Token processing error");
+                return;
             }
         }
 
