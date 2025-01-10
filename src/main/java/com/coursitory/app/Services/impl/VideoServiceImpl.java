@@ -1,6 +1,8 @@
 package com.coursitory.app.Services.impl;
 
+import com.coursitory.app.Entities.Image;
 import com.coursitory.app.Entities.Video;
+import com.coursitory.app.Repositories.ImageRepository;
 import com.coursitory.app.Repositories.VideoRepository;
 import com.coursitory.app.Services.VideoService;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -25,6 +27,9 @@ public class VideoServiceImpl implements VideoService {
     @Autowired
     VideoRepository videoRepository;
 
+    @Autowired
+    ImageRepository imageRepository;
+
     // Method to fetch the video file by its ID
     public GridFSFile getVideoFile(String videoId) throws IOException {
         Query query = new Query();
@@ -41,7 +46,7 @@ public class VideoServiceImpl implements VideoService {
     public boolean deleteVideo(String videoId) {
         try {
             Optional<Video> vid = videoRepository.findById(videoId);
-            if(vid.isPresent()){
+            if (vid.isPresent()) {
 //                System.out.println("video present!");
                 Query query = new Query();
                 query.addCriteria(Criteria.where("_id").is(vid.get().getFileId()));
@@ -52,8 +57,7 @@ public class VideoServiceImpl implements VideoService {
                     return true;
                 }
                 return false;
-            }
-            else{
+            } else {
                 System.out.println("Video not found!");
                 throw new Exception("Video not found!");
             }
@@ -69,21 +73,23 @@ public class VideoServiceImpl implements VideoService {
         if (video.isPresent()) {
             GridFSFile gridFSFile = getVideoFile(video.get().getFileId().toString());
             return gridFsTemplate.getResource(gridFSFile).getInputStream();
-        }
-        else{
+        } else {
             throw new IOException("video id invalid");
         }
     }
 
-    public String uploadVideo(MultipartFile file, MultipartFile thumbnail,String title,String description) throws IOException {
+    public String uploadVideo(MultipartFile file, MultipartFile thumbnail, String title, String description) throws IOException {
         ObjectId fileId = gridFsTemplate.store(file.getInputStream(), file.getOriginalFilename(), file.getContentType());
         Video video = new Video();
         video.setFileId(fileId);
         video.setTitle(title);
         video.setDescription(description);
         video.setVideoType(file.getContentType());
-        video.setThumbnailType(thumbnail.getContentType());
-        video.setThumbnail(thumbnail.getBytes());
+        if (thumbnail != null) {
+            Image img = new Image(thumbnail.getContentType(), thumbnail.getBytes());
+            imageRepository.save(img);
+            video.setThumbnail(img.getId());
+        }
         videoRepository.save(video);
 
         return video.getId().toString();

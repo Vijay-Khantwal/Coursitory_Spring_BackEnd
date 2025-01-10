@@ -20,12 +20,12 @@ public class PDFService {
     @Value("${MAX_PDF_SIZE}")
     private String MAX_FILE_SIZE ;
 
-    public String uploadPDF(MultipartFile file) throws IOException {
+    public String uploadPDF(MultipartFile file,String title) throws IOException {
         if(file.getSize() > Long.parseLong(MAX_FILE_SIZE)){
             throw new IOException("File size exceeds 15MB!!");
         }
         PDF pdf = new PDF();
-        pdf.setFilename(file.getOriginalFilename());
+        pdf.setFilename(title);
         pdf.setContent(file.getBytes());
         pdfRepository.save(pdf);
 

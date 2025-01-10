@@ -13,6 +13,7 @@ public class Video {
 
     // Getters and setters
     @Id
+    @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId id;
     @NonNull
     private ObjectId fileId;
@@ -20,8 +21,9 @@ public class Video {
     private String title;
     private String description;
     private String videoType;
-    private String thumbnailType;
-    private byte[] thumbnail;
+
+    @JsonSerialize(using = ToStringSerializer.class)
+    private ObjectId thumbnail;
 
     public ObjectId getId() {
         return id;
@@ -63,19 +65,11 @@ public class Video {
         this.videoType = videoType;
     }
 
-    public String getThumbnailType() {
-        return thumbnailType;
-    }
-
-    public void setThumbnailType(String thumbnailType) {
-        this.thumbnailType = thumbnailType;
-    }
-
-    public byte[] getThumbnail() {
+    public ObjectId getThumbnail() {
         return thumbnail;
     }
 
-    public void setThumbnail(byte[] thumbnail) {
+    public void setThumbnail(ObjectId thumbnail) {
         this.thumbnail = thumbnail;
     }
 }

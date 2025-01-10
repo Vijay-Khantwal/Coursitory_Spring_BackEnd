@@ -6,6 +6,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document(collection = "users")
 public class User {
     @Id
@@ -14,6 +16,8 @@ public class User {
     @Indexed(unique = true)
     private String username;
     private String password;
+
+    private List<String> enrolled;
 
     public ObjectId getId() {
         return id;
@@ -37,5 +41,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<String> getEnrolled() {
+        return enrolled;
+    }
+
+    public void setEnrolled(List<String> enrolled) {
+        this.enrolled = enrolled;
     }
 }

@@ -11,15 +11,5 @@ public class AdminService {
     @Autowired
     JwtService jwtService;
 
-    @Value("${admin.credentials.username}")
-    private String adminName;
 
-    @Value("${admin.credentials.password}")
-    private String adminPassword;
-    public String verifyAdmin(User user) {
-        if(user.getUsername().equals(adminName) && user.getPassword().equals(adminPassword)){
-            return jwtService.generateToken(adminName,true);
-        }
-        return "Invalid Credentials";
-    }
 }

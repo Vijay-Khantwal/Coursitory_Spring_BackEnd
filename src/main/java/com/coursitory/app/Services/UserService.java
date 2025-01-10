@@ -4,11 +4,14 @@ import com.coursitory.app.Entities.User;
 import com.coursitory.app.Repositories.UserRepository;
 import com.mongodb.DuplicateKeyException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 @Service
 public class UserService {
@@ -24,20 +27,16 @@ public class UserService {
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
 
-    //    public String register(User user){
-//        user.setPassword(encoder.encode(user.getPassword()));
-//        userRepository.save(user);
-//        return user.getId().toString();
-//    }
     public String register(User user) {
         try {
             if (userRepository.findByUsername(user.getUsername()) != null) {
                 throw new IllegalArgumentException("Username is already taken.");
             }
         } catch (Exception e) {
-            return "Username already taken!";
+            return null;
         }
         user.setPassword(encoder.encode(user.getPassword()));
+        user.setEnrolled(new ArrayList<>());
         return userRepository.save(user).getId().toString();
     }
 
@@ -45,10 +44,29 @@ public class UserService {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
         if (authentication.isAuthenticated()) {
             String token = jwtService.generateToken(user.getUsername(),false);
-            return "Jwt Token:- " + token;
+            return token;
         }
-        return "Invalid Credentials";
+        return null;
     }
 
 
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Value("${admin.credentials.username}")
+    private String adminName;
+
+    @Value("${admin.credentials.password}")
+    private String adminPassword;
+    public String verifyAdmin(User user) {
+        if(user.getUsername().equals(adminName) && user.getPassword().equals(adminPassword)){
+            return jwtService.generateToken(adminName,true);
+        }
+        return null;
+    }
 }

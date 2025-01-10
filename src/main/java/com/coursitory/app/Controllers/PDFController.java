@@ -19,18 +19,18 @@ public class PDFController {
 
     @Autowired
     PDFService pdfService;
-
-    @PostMapping("/upload/pdf")
-    public ResponseEntity<String> uploadPDF(@RequestParam("file") MultipartFile file){
-        try {
-            String pdfId = pdfService.uploadPDF(file);
-            return ResponseEntity.status(HttpStatus.CREATED).body("fieldId :- "+pdfId);
-        }
-        catch (IOException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in uploading! " + e.getMessage());
-        }
-
-    }
+//
+//    @PostMapping("/upload/pdf")
+//    public ResponseEntity<String> uploadPDF(@RequestParam("file") MultipartFile file,@RequestParam("title") String title){
+//        try {
+//            String pdfId = pdfService.uploadPDF(file,title);
+//            return ResponseEntity.status(HttpStatus.CREATED).body("fieldId :- "+pdfId);
+//        }
+//        catch (IOException e){
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in uploading! " + e.getMessage());
+//        }
+//
+//    }
 
     @GetMapping("/get/pdf/{id}")
     public ResponseEntity<?> getPDF(@PathVariable("id") String pdfId){
@@ -46,13 +46,13 @@ public class PDFController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
-    @DeleteMapping("delete/pdf/{id}")
-    public  ResponseEntity<String> deletePDF(@PathVariable("id") String pdfId){
-        if(pdfService.deletePDF(pdfId)){
-            return ResponseEntity.ok().body("PDF successfully deleted");
-        }
-        else{
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("PdfId invalid! ");
-        }
-    }
+//    @DeleteMapping("delete/pdf/{id}")
+//    public  ResponseEntity<String> deletePDF(@PathVariable("id") String pdfId){
+//        if(pdfService.deletePDF(pdfId)){
+//            return ResponseEntity.ok().body("PDF successfully deleted");
+//        }
+//        else{
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("PdfId invalid! ");
+//        }
+//    }
 }
