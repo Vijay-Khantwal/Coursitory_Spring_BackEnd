@@ -2,6 +2,7 @@ package com.coursitory.app.Config;
 
 import com.coursitory.app.Services.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,18 +31,21 @@ public class SecurityConfig {
     @Autowired
     JwtFilter jwtFilter;
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:5173")); // Frontend origin
+                    config.setAllowedOrigins(List.of("http://localhost:5173",frontendUrl)); // Frontend origin
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
                     config.setAllowCredentials(true);
                     return config;
                 })).csrf(customizer -> customizer.disable()).
-                authorizeHttpRequests(request -> request.requestMatchers("/user/login/**", "/user/register","/get/courses","/search/course/**","get/image/**","stream/video/**","get/metadata/**").permitAll()
+                authorizeHttpRequests(request -> request.requestMatchers("/user/login/**", "/user/register","/get/courses","/search/course/**","get/image/**","stream/video/**","get/metadata/**","/ping").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/user/**").hasAuthority("USER")
                         .anyRequest().authenticated())

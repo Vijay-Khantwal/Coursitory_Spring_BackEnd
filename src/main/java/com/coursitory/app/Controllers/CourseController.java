@@ -29,6 +29,12 @@ public class CourseController {
     @Autowired
     PDFService pdfService;
 
+    // Just a test api for checking active connection from frontend
+    @GetMapping("/ping")
+    public String testing(){
+        return "Sucess";
+    }
+
 
 //    @PostMapping("/create/course")
 //    public ResponseEntity<Course> createCourse(@RequestParam String title,
