@@ -55,18 +55,14 @@ git clone https://github.com/Vijay-Khantwal/Coursitory_Spring_BackEnd.git
 cd Coursitory_Spring_BackEnd
 ```
 
-### **Create an `application.properties` file in `resources`:**
+### **Create an `.env` file in Root Directory:**
 
 ```properties
-spring.application.name=spring-coursitory-backend
-spring.servlet.multipart.max-file-size=1000MB
-spring.servlet.multipart.max-request-size=1000MB
-spring.data.mongodb.uri=mongodb+srv://<username>:<password>@<cluster-url>/Coursitory?retryWrites=true&w=majority&appName=MyCluster1
-spring.data.mongodb.database=Coursitory
-jwt.secretKey=<your-secret-key> (**THIS KEY MUST BE ATLEAST OF SIZE 256 BITS Eg:-"d2hhdCBub25zZW5zZSBpcyB0aGlzIGNvZGUgYW5kIGRhdGEgc3RydWN0dXJlcw=="**)
-MAX_PDF_SIZE=<SIZE_IN_BYTES>
-admin.credentials.username=<YOUR_ADMIN_USERNAME>
-admin.credentials.password=<YOUR_ADMIN_PASSWORD>
+MONGODB_URI=<MONGO_DB CONNECTION STRING>
+JWT_SECRETKEY=<your-secret-key> (**THIS KEY MUST BE ATLEAST OF SIZE 256 BITS Eg:-"d2hhdCBub25zZW5zZSBpcyB0aGlzIGNvZGUgYW5kIGRhdGEgc3RydWN0dXJlcw=="**)
+ADMIN_USERNAME=<YOUR_ADMIN_USERNAME>
+ADMIN_PASSWORD=<YOUR_ADMIN_PASSWORD>
+FRONTEND_URL=<YOUR_FRONTEND_URL>("https://coursitory.vercel.app")
 ```
 
 ### **Build and run the project:**
