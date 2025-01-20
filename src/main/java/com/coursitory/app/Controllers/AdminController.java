@@ -53,6 +53,23 @@ public class AdminController {
         }
     }
 
+    @PostMapping("/delete/course/{courseId}")
+    public ResponseEntity<String> deleteCourse(@PathVariable String courseId){
+        boolean status = courseService.deleteCourse(courseId);
+        try{
+            if(status){
+                return new ResponseEntity<>("Course deleted successfully.",HttpStatus.OK);
+            }
+            else{
+                return new ResponseEntity<>("Could not find the course!",HttpStatus.NOT_FOUND);
+            }
+        }
+        catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
     @PostMapping("/upload_video/{courseId}")
     public ResponseEntity<String> uploadVideo(@PathVariable String courseId, @RequestParam("file") MultipartFile file,
                                               @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,

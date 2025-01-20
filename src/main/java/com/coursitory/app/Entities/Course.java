@@ -24,6 +24,9 @@ public class Course {
     private List<String> pdfList ;
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId thumbnail;
+    private int reviewCount; // Total number of reviews
+    private List<String> reviewIds; // List of review IDs
+    private int price = 0;
 
     public Course(@NonNull String title, String description, List<String> tags) {
         this.title = title;
@@ -93,5 +96,29 @@ public class Course {
 
     public void setThumbnail(ObjectId thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public int getReviewCount() {
+        return reviewCount;
+    }
+
+    public void setReviewCount(int reviewCount) {
+        this.reviewCount = reviewCount;
+    }
+
+    public List<String> getReviewIds() {
+        return reviewIds;
+    }
+
+    public void setReviewIds(List<String> reviewIds) {
+        this.reviewIds = reviewIds;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
     }
 }

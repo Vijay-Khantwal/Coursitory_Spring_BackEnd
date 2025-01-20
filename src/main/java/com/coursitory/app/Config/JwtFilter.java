@@ -46,6 +46,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
+//        System.out.println(authHeader);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
@@ -61,6 +62,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
         }
+//        System.out.println(username);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             Boolean isAdmin = jwtService.extractIsAdmin(token);

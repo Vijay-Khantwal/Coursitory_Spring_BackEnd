@@ -52,6 +52,9 @@ public class VideoServiceImpl implements VideoService {
                 query.addCriteria(Criteria.where("_id").is(vid.get().getFileId()));
                 videoRepository.deleteById(videoId);
                 GridFSFile gridFSFile = gridFsTemplate.findOne(query);
+
+                //deleteThumbnail
+                imageRepository.deleteById(vid.get().getThumbnail());
                 if (gridFSFile != null) {
                     gridFsTemplate.delete(query);
                     return true;
