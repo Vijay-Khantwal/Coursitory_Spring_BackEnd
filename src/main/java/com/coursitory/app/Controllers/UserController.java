@@ -68,39 +68,39 @@ public class UserController {
 //        return "Hello !";
 //    }
 
-    @PostMapping("/enroll/{courseId}")
-    public ResponseEntity<String> enrollInCourse(@PathVariable String courseId) {
-        try {
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-            if (courseService.getCourseById(courseId) == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found");
-            }
-
-            User user = userService.findUserByUsername(username);
-            if (user == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-            }
-
-            List<String> enrolledCourses = user.getEnrolled();
-            if (enrolledCourses == null) {
-                enrolledCourses = new ArrayList<>();
-            }
-            if (enrolledCourses.contains(courseId)) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("User already enrolled in this course");
-            }
-
-            enrolledCourses.add(courseId);
-            user.setEnrolled(enrolledCourses);
-
-            // Save updated user
-            userService.save(user);
-
-            return ResponseEntity.ok("Successfully enrolled in course");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
-        }
-    }
+//    @PostMapping("/enroll/{courseId}")
+//    public ResponseEntity<String> enrollInCourse(@PathVariable String courseId) {
+//        try {
+//            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+//
+//            if (courseService.getCourseById(courseId) == null) {
+//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found");
+//            }
+//
+//            User user = userService.findUserByUsername(username);
+//            if (user == null) {
+//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+//            }
+//
+//            List<String> enrolledCourses = user.getEnrolled();
+//            if (enrolledCourses == null) {
+//                enrolledCourses = new ArrayList<>();
+//            }
+//            if (enrolledCourses.contains(courseId)) {
+//                return ResponseEntity.status(HttpStatus.CONFLICT).body("User already enrolled in this course");
+//            }
+//
+//            enrolledCourses.add(courseId);
+//            user.setEnrolled(enrolledCourses);
+//
+//            // Save updated user
+//            userService.save(user);
+//
+//            return ResponseEntity.ok("Successfully enrolled in course");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+//        }
+//    }
 
 
     @GetMapping("/get/courses")
