@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "users")
@@ -17,7 +18,7 @@ public class User {
     private String username;
     private String password;
 
-    private List<String> enrolled;
+    private List<String> enrolled = new ArrayList<>();
 
     public ObjectId getId() {
         return id;

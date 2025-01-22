@@ -69,9 +69,19 @@ public class CourseController {
         }
     }
     @GetMapping("/search/course/{pattern}")
-    public ResponseEntity<Map<String, List<Course>>> searchCourses(@PathVariable String pattern) {
-        Map<String, List<Course>> result = courseService.searchCourses(pattern);
+    public ResponseEntity<Map<String,List<Course>>> searchCourses(@PathVariable String pattern) {
+        Map<String,List<Course>> result = courseService.searchCourses(pattern);
         return ResponseEntity.ok(result);
+    }
+    @GetMapping("/get/course/{id}")
+    public ResponseEntity<Course> getCourseById(@PathVariable String id){
+        Course course = courseService.getCourseById(id);
+        if(course  == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        else{
+            return new ResponseEntity<>(course,HttpStatus.OK);
+        }
     }
 
 //    @PostMapping("/upload_video/{courseId}")
