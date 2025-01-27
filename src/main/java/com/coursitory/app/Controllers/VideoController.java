@@ -158,18 +158,18 @@ public class VideoController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             }
 
-            // Fetch user by username
             User user = userService.findUserByUsername(username);
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
 
-//             Retrieve the list of enrolled courses
             List<String> enrolledCourseIds = user.getEnrolled();
             boolean isEnrolled = enrolledCourseIds.contains(courseId);
             if (!isEnrolled) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Forbidden if not enrolled
             }
+
+
             InputStream videoStream = videoService.getVideoInputStream(videoId);
             long videoLength = videoService.getVideoContentLength(videoId);
 

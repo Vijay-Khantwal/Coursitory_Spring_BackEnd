@@ -47,7 +47,6 @@ public class PaymentController {
         return enrollmentService.isUserAlreadyEnrolled(userId,courseId);
     }
 
-    // Create order and initiate payment
     @GetMapping("/createOrder/{courseId}")
     public ResponseEntity<Map<String, String>> createOrder(@PathVariable String courseId) {
         Map<String, String> responseMap = new HashMap<>();
@@ -81,11 +80,10 @@ public class PaymentController {
 
             RazorpayClient razorpayClient = new RazorpayClient(keyId, secret);
             JSONObject orderRequest = new JSONObject();
-            orderRequest.put("amount", amountInPaise); // Amount should be in paise
+            orderRequest.put("amount", amountInPaise);
             orderRequest.put("currency", "INR");
             orderRequest.put("receipt", enrollmentService.generateReceipt(user.getId().toString(), courseId));
 
-            // Create the Razorpay order
             Order order = razorpayClient.orders.create(orderRequest);
             String orderId = order.get("id");
 
@@ -93,17 +91,15 @@ public class PaymentController {
             enrollmentService.savePaymentLog(user.getId().toString(), courseId, orderId, "", "", "PENDING");
 
             responseMap.put("order_id", orderId);
-            responseMap.put("amount", String.valueOf(amountInPaise)); // Amount in paise
+            responseMap.put("amount", String.valueOf(amountInPaise));
             return new ResponseEntity<>(responseMap, HttpStatus.OK);
 
-        } catch (RazorpayException e) {
-            e.printStackTrace();
+        } catch (RazorpayException e){
             responseMap.put("error", "Razorpay exception occurred: " + e.getMessage());
             return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // Payment verification and user enrollment
     @PostMapping("/verify")
     public ResponseEntity<String> verifyPayment(@RequestBody Map<String, String> paymentData) {
         String razorpayPaymentId = paymentData.get("razorpay_payment_id");
@@ -112,29 +108,19 @@ public class PaymentController {
         String courseId = paymentData.get("courseId");
 
         try {
-            // Step 1: Verify Razorpay signature
             if (!verifySignature(razorpayOrderId, razorpayPaymentId, razorpaySignature)) {
                 return new ResponseEntity<>("Invalid payment signature", HttpStatus.BAD_REQUEST);
             }
 
-            // Step 2: Ensure that the payment_id has not been processed previously
             if (enrollmentService.isPaymentProcessed(razorpayPaymentId)) {
                 return new ResponseEntity<>("Payment has already been processed", HttpStatus.BAD_REQUEST);
             }
-
-
-            // Step 4: Generate a unique receipt
-//            String receipt = generateReceipt(userId, courseId);
-
-            // Step 5: Enroll user
             enrollmentService.enrollUser("",courseId, razorpayPaymentId, razorpayOrderId, razorpaySignature, "SUCCESS");
 
             return new ResponseEntity<>("User successfully enrolled", HttpStatus.OK);
 
         } catch (Exception e) {
             e.printStackTrace();
-            // Log failure in payment logs within enrollments collection
-
             enrollmentService.enrollUser("",courseId, razorpayPaymentId, razorpayOrderId, razorpaySignature, "FAILED");
             return new ResponseEntity<>("Payment verification failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
