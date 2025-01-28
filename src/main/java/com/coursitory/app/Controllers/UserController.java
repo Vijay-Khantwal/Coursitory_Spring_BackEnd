@@ -63,6 +63,18 @@ public class UserController {
         return new ResponseEntity<>(Map.of("token", token), HttpStatus.OK);
     }
 
+    @PostMapping("/gLogin")
+    public ResponseEntity<Map<String, String>> gLogin(@RequestParam String email) {
+        String token = null;
+        try {
+            token = userService.handleGLogin(email);
+            return new ResponseEntity<>(Map.of("token",token),HttpStatus.OK);
+
+        }catch (Exception e){
+            return new ResponseEntity<>(Map.of("error", "Error occured while trying to sign in"), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
 //    @GetMapping("/testing")
 //    public String testing() {
 //        return "Hello !";

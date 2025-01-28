@@ -44,7 +44,7 @@ public class SecurityConfig {
                     config.setAllowCredentials(true);
                     return config;
                 })).csrf(customizer -> customizer.disable()).
-                authorizeHttpRequests(request -> request.requestMatchers("/payment/**","/reviews/**","/user/login/**", "/user/register","/get/**","/search/course/**","/stream/video/**","/ping").permitAll()
+                authorizeHttpRequests(request -> request.requestMatchers("/user/**","/payment/**","/reviews/**","/get/**","/search/course/**","/stream/video/**","/ping").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/user/**").hasAuthority("USER")
                         .anyRequest().authenticated())
