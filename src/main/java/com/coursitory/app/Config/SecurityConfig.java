@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -26,7 +25,7 @@ import java.util.List;
 public class SecurityConfig {
 
     @Autowired
-    UserDetailsService userDetailsService;
+    MyUserDetailsService userDetailsService;
 
     @Autowired
     JwtFilter jwtFilter;
@@ -45,7 +44,7 @@ public class SecurityConfig {
                     config.setAllowCredentials(true);
                     return config;
                 })).csrf(customizer -> customizer.disable()).
-                authorizeHttpRequests(request -> request.requestMatchers("/payment/**","/reviews/**","/user/login/**", "/user/register","/get/**","/search/course/**","/stream/video/**","/ping").permitAll()
+                authorizeHttpRequests(request -> request.requestMatchers("/user/**","/payment/**","/reviews/**","/get/**","/search/course/**","/stream/video/**","/ping").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/user/**").hasAuthority("USER")
                         .anyRequest().authenticated())

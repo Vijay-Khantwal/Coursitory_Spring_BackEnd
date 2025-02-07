@@ -34,16 +34,14 @@ public class CourseService {
             course.setTags(new ArrayList<>());
         }
 
-        // Set default values for the fields that the client does not provide
-        course.setRating(0); // Default rating is 0
-        course.setVideoList(new ArrayList<>()); // Default empty list for videoList
-        course.setPdfList(new ArrayList<>()); // Default empty list for pdfList
+        course.setRating(0);
+        course.setVideoList(new ArrayList<>());
+        course.setPdfList(new ArrayList<>());
         if (thumbnail != null) {
             Image img = new Image(thumbnail.getContentType(), thumbnail.getBytes());
             imageRepository.save(img);
             course.setThumbnail(img.getId());
         }
-        // Save the course in the database
         courseRepository.save(course);
     }
 
@@ -76,22 +74,22 @@ public class CourseService {
         List<Course> byTags = courseRepository.findByTagsContaining(pattern);
 
         List<Course> result = new ArrayList<>();
-        Set<ObjectId> addedCourseIds = new HashSet<>(); // Use a Set to track unique Course IDs (assuming Course has a unique ID field)
+        Set<ObjectId> addedCourseIds = new HashSet<>();
 
         for (Course course : byTitle) {
-            if (addedCourseIds.add(course.getId())) { // Add to Set and check if it's unique
+            if (addedCourseIds.add(course.getId())) {
                 result.add(course);
             }
         }
 
         for (Course course : byDesc) {
-            if (addedCourseIds.add(course.getId())) { // Add to Set and check if it's unique
+            if (addedCourseIds.add(course.getId())) {
                 result.add(course);
             }
         }
 
         for (Course course : byTags) {
-            if (addedCourseIds.add(course.getId())) { // Add to Set and check if it's unique
+            if (addedCourseIds.add(course.getId())) {
                 result.add(course);
             }
         }

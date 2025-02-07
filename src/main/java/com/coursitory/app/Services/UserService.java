@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Base64;
 
 @Service
 public class UserService {
@@ -68,5 +69,20 @@ public class UserService {
             return jwtService.generateToken(adminName,true);
         }
         return null;
+    }
+
+    public String handleGLogin(String email) {
+        String decodedMail = new String(Base64.getDecoder().decode(email));
+//        System.out.println(decodedMail);
+        User user = findUserByUsername(decodedMail);
+        if(user == null){
+            user = new User();
+            user.setUsername(decodedMail);
+            user.setPassword(encoder.encode(decodedMail));
+            user.setEnrolled(new ArrayList<>());
+            userRepository.save(user);
+        }
+
+        return jwtService.generateToken(user.getUsername(),false);
     }
 }

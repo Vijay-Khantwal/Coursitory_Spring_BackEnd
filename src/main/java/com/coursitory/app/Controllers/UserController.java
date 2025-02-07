@@ -63,6 +63,18 @@ public class UserController {
         return new ResponseEntity<>(Map.of("token", token), HttpStatus.OK);
     }
 
+    @PostMapping("/gLogin")
+    public ResponseEntity<Map<String, String>> gLogin(@RequestParam String email) {
+        String token = null;
+        try {
+            token = userService.handleGLogin(email);
+            return new ResponseEntity<>(Map.of("token",token),HttpStatus.OK);
+
+        }catch (Exception e){
+            return new ResponseEntity<>(Map.of("error", "Error occured while trying to sign in"), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
 //    @GetMapping("/testing")
 //    public String testing() {
 //        return "Hello !";
@@ -106,22 +118,18 @@ public class UserController {
     @GetMapping("/get/courses")
     public ResponseEntity<List<Course>> getEnrolledCourses(HttpServletRequest request) {
         try {
-            // Extract username from the SecurityContext
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-            // Fetch user by username
             User user = userService.findUserByUsername(username);
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
 
-            // Retrieve the list of enrolled courses
             List<String> enrolledCourseIds = user.getEnrolled();
             if (enrolledCourseIds == null || enrolledCourseIds.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ArrayList<>());
             }
 
-            // Fetch course details for the enrolled course IDs
             List<Course> enrolledCourses = courseService.getCoursesByIds(enrolledCourseIds);
 
             return ResponseEntity.ok(enrolledCourses);
@@ -134,16 +142,13 @@ public class UserController {
     @GetMapping("/check/enrollment/{courseId}")
     public boolean checkEnrollment(@PathVariable String courseId) {
         try {
-            // Extract username from the SecurityContext
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-            // Fetch user by username
             User user = userService.findUserByUsername(username);
             if (user == null) {
                 return false;
             }
 
-            // Retrieve the list of enrolled courses
             List<String> enrolledCourseIds = user.getEnrolled();
             for (String enrolledCourseId : enrolledCourseIds) {
                 if (Objects.equals(enrolledCourseId, courseId)) {

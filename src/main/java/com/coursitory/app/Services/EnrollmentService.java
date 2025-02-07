@@ -43,7 +43,6 @@ public class EnrollmentService {
 
         if (existingEnrollment != null) {
             String receipt = generateReceipt(existingEnrollment.getUserId(), courseId);
-            // If orderId exists, update the existing record
             existingEnrollment.setPaymentId(paymentId);
             existingEnrollment.setSignature(signature);
             existingEnrollment.setStatus(status);
@@ -63,7 +62,6 @@ public class EnrollmentService {
 
     }
 
-    // Check if the user is already enrolled
     public boolean isUserAlreadyEnrolled(String userId, String courseId) {
         Optional<User> user = userRepository.findById(new ObjectId(userId));
 
@@ -75,12 +73,10 @@ public class EnrollmentService {
         return false;
     }
 
-    // Check if the payment has already been processed
     public boolean isPaymentProcessed(String paymentId) {
         return enrollmentRepository.existsByPaymentId(paymentId);
     }
 
-    // Save payment logs (inside enrollments collection now)
     public void savePaymentLog(String userId, String courseId, String orderId, String paymentId, String signature, String status) {
         Enrollment enrollment = new Enrollment();
         enrollment.setUserId(userId);
@@ -92,7 +88,6 @@ public class EnrollmentService {
         enrollmentRepository.save(enrollment);
     }
 
-    // Generate a unique receipt using SHA-256 hashing
     public String generateReceipt(String userId, String courseId) {
         try {
             String input = userId + courseId + System.currentTimeMillis();

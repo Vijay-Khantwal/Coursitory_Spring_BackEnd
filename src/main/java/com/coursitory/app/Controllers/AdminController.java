@@ -1,8 +1,6 @@
 package com.coursitory.app.Controllers;
 
 import com.coursitory.app.Entities.Course;
-import com.coursitory.app.Entities.User;
-import com.coursitory.app.Services.AdminService;
 import com.coursitory.app.Services.CourseService;
 import com.coursitory.app.Services.PDFService;
 import com.coursitory.app.Services.VideoService;
@@ -14,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/admin")
@@ -22,9 +19,6 @@ public class AdminController {
 
     @Autowired
     PDFService pdfService;
-
-    @Autowired
-    AdminService adminService;
 
     @Autowired
     CourseService courseService;
